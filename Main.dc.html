@@ -369,6 +369,7 @@ button,input,textarea,select{font-family:inherit}
 
     <div style="display: flex; flex-direction: column; gap: 10px">
       <h2 style="margin: 0; font-size: 16px; font-weight: 700">3. Saat seç</h2>
+      <sc-if value="{{bizDayClosed}}" hint-placeholder-val="{{false}}"><span style="font-size: 13px; font-weight: 600; color: #8A4B00">İşletme bu gün kapalı. Başka bir gün seç.</span></sc-if>
       <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px">
         <sc-for list="{{slots}}" as="t" hint-placeholder-count="12">
           <sc-if value="{{t.selected}}" hint-placeholder-val="{{false}}">
@@ -464,6 +465,25 @@ button,input,textarea,select{font-family:inherit}
           </div>
         </div>
       </sc-if>
+      <sc-if value="{{bizTakesIban}}" hint-placeholder-val="{{false}}">
+        <label style="display: flex; align-items: center; gap: 12px; padding: 14px 16px; border: 1px solid #E6E4EE; border-radius: 16px; cursor: pointer">
+          <input type="radio" name="card" checked="{{cardIban}}" onChange="{{pickIban}}" style="width: 20px; height: 20px; margin: 0; accent-color: #4A2FD1">
+          <span style="display: flex; flex-direction: column; gap: 2px; flex: 1"><span style="font-size: 15px; font-weight: 600">Havale / EFT ile öde</span><span style="font-size: 12px; color: #5E5B6B">İşletmenin IBAN'ına gönder, dekontu yükle</span></span>
+        </label>
+      </sc-if>
+      <sc-if value="{{cardIban}}" hint-placeholder-val="{{false}}">
+        <div style="display: flex; flex-direction: column; gap: 10px; padding: 16px; border-radius: 16px; border: 1px solid #D8CCF5; background: #FAF7FF">
+          <span style="font-size: 14px; font-weight: 700; color: #4C1D95">{{ibanTitle}}</span>
+          <div style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 12px; color: #5E5B6B">Alıcı</span><span style="font-size: 14px; font-weight: 700">{{ibanHolder}}</span></div>
+          <div style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 12px; color: #5E5B6B">IBAN</span><span style="font-size: 15px; font-weight: 700; letter-spacing: 0.02em">{{ibanText}}</span></div>
+          <span style="font-size: 12px; line-height: 1.5; color: #5E5B6B">{{ibanNote}}</span>
+          <div style="display: flex; gap: 8px">
+            <button onClick="{{copyIban}}" style="flex: 1; height: 42px; border: 0; border-radius: 12px; background: #6B21A8; color: #FFFFFF; font-size: 14px; font-weight: 700; cursor: pointer">IBAN'ı kopyala</button>
+            <sc-if value="{{dekontNot}}" hint-placeholder-val="{{true}}"><button onClick="{{uploadDekont}}" style="flex: 1; height: 42px; border: 1px solid #D8CCF5; border-radius: 12px; background: #FFFFFF; color: #4C1D95; font-size: 14px; font-weight: 700; cursor: pointer">Dekont yükle</button></sc-if>
+            <sc-if value="{{dekontDone}}" hint-placeholder-val="{{false}}"><span style="flex: 1; height: 42px; border-radius: 12px; background: #DCFCE7; color: #166534; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center">Dekont yüklendi</span></sc-if>
+          </div>
+        </div>
+      </sc-if>
     </div>
 
     <div style="display: flex; flex-direction: column; gap: 10px; padding: 14px 16px; border-radius: 16px; background: #FFF4E5; color: #6B3A00">
@@ -479,11 +499,11 @@ button,input,textarea,select{font-family:inherit}
     </div>
   </div>
   <div style="padding: 12px 20px 28px; border-top: 1px solid #EEEDF3; background: #FFFFFF; display: flex; flex-direction: column; gap: 8px">
-    <sc-if value="{{canPay}}" hint-placeholder-val="{{false}}"><button onClick="{{pay}}" style="height: 54px; border: 0; border-radius: 16px; background: #4A2FD1; color: #FFFFFF; font-size: 16px; font-weight: 700; cursor: pointer">99₺ öde ve yerimi ayır</button></sc-if>
+    <sc-if value="{{canPay}}" hint-placeholder-val="{{false}}"><button onClick="{{pay}}" style="height: 54px; border: 0; border-radius: 16px; background: #4A2FD1; color: #FFFFFF; font-size: 16px; font-weight: 700; cursor: pointer">{{payLabel}}</button></sc-if>
     <sc-if value="{{paying}}" hint-placeholder-val="{{false}}"><button disabled style="height: 54px; border: 0; border-radius: 16px; background: #6B55DC; color: #FFFFFF; font-size: 16px; font-weight: 700">Ödeme alınıyor…</button></sc-if>
     <sc-if value="{{payBlocked}}" hint-placeholder-val="{{true}}">
       <span style="font-size: 12px; color: #5E5B6B; text-align: center">Devam etmek için kapora koşullarını onayla</span>
-      <button disabled style="height: 54px; border: 0; border-radius: 16px; background: #E6E4EE; color: #5E5B6B; font-size: 16px; font-weight: 700">99₺ öde ve yerimi ayır</button>
+      <button disabled style="height: 54px; border: 0; border-radius: 16px; background: #E6E4EE; color: #5E5B6B; font-size: 16px; font-weight: 700">{{payLabel}}</button>
     </sc-if>
   </div>
 </div>
@@ -497,13 +517,26 @@ button,input,textarea,select{font-family:inherit}
       <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg>
     </div>
     <h1 style="margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -0.02em">Yerin ayrıldı!</h1>
-    <p style="margin: 0; font-size: 15px; line-height: 1.5; color: #5E5B6B">99₺ kapora ödendi. Randevu kodun <strong style="color: #17161C">{{lastCode}}</strong></p>
+    <p style="margin: 0; font-size: 15px; line-height: 1.5; color: #5E5B6B">{{lastPayText}} Randevu kodun <strong style="color: #17161C">{{lastCode}}</strong></p>
     <div style="width: 100%; box-sizing: border-box; display: flex; flex-direction: column; gap: 10px; padding: 16px; border-radius: 18px; background: #F4F3F8; text-align: left; font-size: 14px">
       <div style="display: flex; justify-content: space-between; gap: 12px"><span style="color: #5E5B6B">İşletme</span><strong>{{lastBiz}}</strong></div>
       <div style="display: flex; justify-content: space-between; gap: 12px"><span style="color: #5E5B6B">Hizmet</span><span>{{lastSvc}}</span></div>
       <div style="display: flex; justify-content: space-between; gap: 12px"><span style="color: #5E5B6B">Zaman</span><span>{{lastWhen}}</span></div>
       <div style="display: flex; justify-content: space-between; gap: 12px"><span style="color: #5E5B6B">Salonda ödenecek</span><strong>{{lastRest}}</strong></div>
     </div>
+    <sc-if value="{{lastIsIban}}" hint-placeholder-val="{{false}}">
+      <div style="width: 100%; box-sizing: border-box; display: flex; flex-direction: column; gap: 10px; padding: 16px; border-radius: 16px; border: 1px solid #D8CCF5; background: #FAF7FF; text-align: left">
+        <span style="font-size: 14px; font-weight: 700; color: #4C1D95">{{ibanTitle}}</span>
+        <div style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 12px; color: #5E5B6B">Alıcı</span><span style="font-size: 14px; font-weight: 700">{{ibanHolder}}</span></div>
+        <div style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 12px; color: #5E5B6B">IBAN</span><span style="font-size: 15px; font-weight: 700; letter-spacing: 0.02em">{{ibanText}}</span></div>
+        <span style="font-size: 12px; line-height: 1.5; color: #5E5B6B">{{ibanNote}}</span>
+        <div style="display: flex; gap: 8px">
+          <button onClick="{{copyIban}}" style="flex: 1; height: 42px; border: 0; border-radius: 12px; background: #6B21A8; color: #FFFFFF; font-size: 14px; font-weight: 700; cursor: pointer">IBAN'ı kopyala</button>
+          <sc-if value="{{dekontNot}}" hint-placeholder-val="{{true}}"><button onClick="{{uploadDekont}}" style="flex: 1; height: 42px; border: 1px solid #D8CCF5; border-radius: 12px; background: #FFFFFF; color: #4C1D95; font-size: 14px; font-weight: 700; cursor: pointer">Dekont yükle</button></sc-if>
+          <sc-if value="{{dekontDone}}" hint-placeholder-val="{{false}}"><span style="flex: 1; height: 42px; border-radius: 12px; background: #DCFCE7; color: #166534; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center">Dekont yüklendi</span></sc-if>
+        </div>
+      </div>
+    </sc-if>
     <div style="width: 100%; box-sizing: border-box; display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border-radius: 16px; background: #ECE8FF; color: #2E1C8F; text-align: left">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0; margin-top: 1px"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"></path></svg>
       <span style="font-size: 14px; line-height: 1.5">{{lastBiz}}, randevundan 30 dakika önce seni arayıp gelip gelmeyeceğini teyit edecek.</span>
@@ -541,10 +574,11 @@ button,input,textarea,select{font-family:inherit}
             <span style="display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0"><span style="font-size: 16px; font-weight: 700">{{u.bizName}}</span><span style="font-size: 13px; color: #5E5B6B">{{u.svc}}</span></span>
             <sc-if value="{{u.isConfirmed}}" hint-placeholder-val="{{false}}"><span style="padding: 4px 10px; border-radius: 999px; background: #DCFCE7; color: #166534; font-size: 12px; font-weight: 700; white-space: nowrap">Teyit edildi</span></sc-if>
             <sc-if value="{{u.isPending}}" hint-placeholder-val="{{true}}"><span style="padding: 4px 10px; border-radius: 999px; background: #FFF4E5; color: #8A4B00; font-size: 12px; font-weight: 700; white-space: nowrap">Teyit bekleniyor</span></sc-if>
+            <sc-if value="{{u.isIban}}" hint-placeholder-val="{{false}}"><span style="padding: 4px 10px; border-radius: 999px; background: #F3E8FF; color: #6B21A8; font-size: 12px; font-weight: 700; white-space: nowrap">Havale bekleniyor</span></sc-if>
           </span>
           <span style="display: flex; justify-content: space-between; width: 100%; padding-top: 12px; border-top: 1px solid #EEEDF3; font-size: 14px">
             <strong>{{u.whenLabel}}</strong>
-            <span style="color: #5E5B6B">Kapora ödendi</span>
+            <span style="color: #5E5B6B">{{u.payText}}</span>
           </span>
         </button>
       </sc-for>
@@ -600,18 +634,36 @@ button,input,textarea,select{font-family:inherit}
     <div style="display: flex; flex-direction: column; gap: 8px; padding: 20px; border-radius: 20px; background: #17161C; color: #FFFFFF">
       <sc-if value="{{aConfirmed}}" hint-placeholder-val="{{false}}"><span style="align-self: flex-start; padding: 4px 10px; border-radius: 999px; background: #DCFCE7; color: #166534; font-size: 12px; font-weight: 700">Teyit edildi</span></sc-if>
       <sc-if value="{{aPending}}" hint-placeholder-val="{{true}}"><span style="align-self: flex-start; padding: 4px 10px; border-radius: 999px; background: #FFF4E5; color: #8A4B00; font-size: 12px; font-weight: 700">Teyit araması bekleniyor</span></sc-if>
+      <sc-if value="{{aIban}}" hint-placeholder-val="{{false}}"><span style="align-self: flex-start; padding: 4px 10px; border-radius: 999px; background: #F3E8FF; color: #6B21A8; font-size: 12px; font-weight: 700">Havale onayı bekleniyor</span></sc-if>
       <span style="font-size: 26px; font-weight: 800; letter-spacing: -0.02em">{{aWhen}}</span>
       <span style="font-size: 15px; color: #D6D3E0">{{aSvc}} · {{aBiz}}</span>
       <span style="font-size: 13px; color: #C9BFFF">Randevu kodu {{aCode}}</span>
     </div>
     <div style="display: flex; flex-direction: column; gap: 10px; padding: 16px; border-radius: 18px; background: #F4F3F8; font-size: 14px">
       <div style="display: flex; justify-content: space-between"><span style="color: #5E5B6B">Hizmet ücreti</span><span>{{aPrice}}</span></div>
-      <div style="display: flex; justify-content: space-between"><span style="color: #5E5B6B">Ödenen kapora</span><span style="color: #157F3D; font-weight: 700">99₺</span></div>
+      <div style="display: flex; justify-content: space-between"><span style="color: #5E5B6B">{{aDepLabel}}</span><span style="color: {{aDepColor}}; font-weight: 700">99₺</span></div>
       <div style="display: flex; justify-content: space-between; font-weight: 700"><span>Salonda ödenecek</span><span>{{aRest}}</span></div>
     </div>
     <div style="display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border: 1px solid #E6E4EE; border-radius: 16px">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5E5B6B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink: 0; margin-top: 1px"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"></path><circle cx="12" cy="9.5" r="2.5"></circle></svg>
       <span style="flex: 1; font-size: 14px; line-height: 1.45">{{aAddress}}</span>
+    </div>
+    <sc-if value="{{aShowIban}}" hint-placeholder-val="{{false}}">
+      <div style="display: flex; flex-direction: column; gap: 10px; padding: 16px; border-radius: 16px; border: 1px solid #D8CCF5; background: #FAF7FF">
+        <span style="font-size: 14px; font-weight: 700; color: #4C1D95">{{ibanTitle}}</span>
+        <div style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 12px; color: #5E5B6B">Alıcı</span><span style="font-size: 14px; font-weight: 700">{{ibanHolder}}</span></div>
+        <div style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 12px; color: #5E5B6B">IBAN</span><span style="font-size: 15px; font-weight: 700; letter-spacing: 0.02em">{{ibanText}}</span></div>
+        <span style="font-size: 12px; line-height: 1.5; color: #5E5B6B">{{ibanNote}}</span>
+        <div style="display: flex; gap: 8px">
+          <button onClick="{{copyIban}}" style="flex: 1; height: 42px; border: 0; border-radius: 12px; background: #6B21A8; color: #FFFFFF; font-size: 14px; font-weight: 700; cursor: pointer">IBAN'ı kopyala</button>
+          <sc-if value="{{dekontNot}}" hint-placeholder-val="{{true}}"><button onClick="{{uploadDekont}}" style="flex: 1; height: 42px; border: 1px solid #D8CCF5; border-radius: 12px; background: #FFFFFF; color: #4C1D95; font-size: 14px; font-weight: 700; cursor: pointer">Dekont yükle</button></sc-if>
+          <sc-if value="{{dekontDone}}" hint-placeholder-val="{{false}}"><span style="flex: 1; height: 42px; border-radius: 12px; background: #DCFCE7; color: #166534; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center">Dekont yüklendi</span></sc-if>
+        </div>
+      </div>
+    </sc-if>
+    <div style="display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 14px; background: #F4F3F8">
+      <span style="flex: 1; font-size: 13px; line-height: 1.45; color: #3F3D4A">{{shareLine}}</span>
+      <button onClick="{{goMyIban}}" style="height: 34px; padding: 0 10px; border: 0; border-radius: 8px; background: #FFFFFF; color: #4A2FD1; font-size: 12px; font-weight: 700; cursor: pointer; flex-shrink: 0">{{shareBtn}}</button>
     </div>
     <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
       <button onClick="{{directions}}" style="height: 64px; border: 1px solid #E6E4EE; border-radius: 14px; background: #FFFFFF; color: #17161C; font-size: 12px; font-weight: 700; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; cursor: pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l18-8-8 18-2-8z"></path></svg>Yol tarifi</button>
@@ -714,6 +766,7 @@ button,input,textarea,select{font-family:inherit}
     <div style="display: flex; flex-direction: column; border: 1px solid #E6E4EE; border-radius: 18px; overflow: hidden">
       <button onClick="{{goMyReviews}}" style="display: flex; align-items: center; gap: 12px; width: 100%; height: 56px; padding: 0 16px; border: 0; border-bottom: 1px solid #EEEDF3; background: #FFFFFF; color: #17161C; font-size: 15px; font-weight: 600; text-align: left; cursor: pointer"><span style="flex: 1">Değerlendirmelerim</span><span style="font-size: 13px; color: #5E5B6B">{{statReviews}}</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9A97A8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"></path></svg></button>
       <button onClick="{{goPayments}}" style="display: flex; align-items: center; gap: 12px; width: 100%; height: 56px; padding: 0 16px; border: 0; border-bottom: 1px solid #EEEDF3; background: #FFFFFF; color: #17161C; font-size: 15px; font-weight: 600; text-align: left; cursor: pointer"><span style="flex: 1">Ödemeler ve kartlarım</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9A97A8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"></path></svg></button>
+      <button onClick="{{goMyIban}}" style="display: flex; align-items: center; gap: 12px; width: 100%; height: 56px; padding: 0 16px; border: 0; border-bottom: 1px solid #EEEDF3; background: #FFFFFF; color: #17161C; font-size: 15px; font-weight: 600; text-align: left; cursor: pointer"><span style="flex: 1">Banka hesabım (IBAN)</span><span style="font-size: 13px; color: #5E5B6B">{{myIbanShort}}</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9A97A8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"></path></svg></button>
       <button onClick="{{goSettings}}" style="display: flex; align-items: center; gap: 12px; width: 100%; height: 56px; padding: 0 16px; border: 0; border-bottom: 1px solid #EEEDF3; background: #FFFFFF; color: #17161C; font-size: 15px; font-weight: 600; text-align: left; cursor: pointer"><span style="flex: 1">Bildirim ayarları</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9A97A8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"></path></svg></button>
       <button onClick="{{goLoc}}" style="display: flex; align-items: center; gap: 12px; width: 100%; height: 56px; padding: 0 16px; border: 0; background: #FFFFFF; color: #17161C; font-size: 15px; font-weight: 600; text-align: left; cursor: pointer"><span style="flex: 1">Konum</span><span style="font-size: 13px; color: #5E5B6B">{{locShort}}</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9A97A8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"></path></svg></button>
     </div>
@@ -786,6 +839,40 @@ button,input,textarea,select{font-family:inherit}
 </div>
 </sc-if>
 
+<!-- ================= BANKA HESABIM ================= -->
+<sc-if value="{{isMyIban}}" hint-placeholder-val="{{false}}">
+<div style="position: absolute; inset: 0; display: flex; flex-direction: column">
+  <div style="display: flex; align-items: center; gap: 12px; padding: 14px 16px 6px">
+    <button aria-label="Geri" onClick="{{myIbanBack}}" style="width: 44px; height: 44px; border: 0; border-radius: 22px; background: #F4F3F8; color: #17161C; display: flex; align-items: center; justify-content: center; cursor: pointer"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg></button>
+    <span style="font-size: 16px; font-weight: 700">Banka hesabım (IBAN)</span>
+  </div>
+  <div style="flex: 1; min-height: 0; overflow-y: auto; padding: 12px 20px 24px; display: flex; flex-direction: column; gap: 16px">
+    <p style="margin: 0; font-size: 14px; line-height: 1.55; color: #5E5B6B">IBAN'ını kaydedersen, randevunu işletme iptal ettiğinde kapora iadesi bu hesaba yapılır. İstersen randevu aldığın işletmelerle de paylaşabilirsin.</p>
+    <label style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600; color: #5E5B6B">
+      IBAN
+      <input type="text" placeholder="TR00 0000 0000 0000 0000 0000 00" value="{{myIban}}" onChange="{{onMyIban}}" style="height: 50px; padding: 0 14px; border: 1px solid #D9D7E3; border-radius: 12px; font-size: 15px; letter-spacing: 0.02em; color: #17161C; background: #FFFFFF; outline-color: #4A2FD1">
+    </label>
+    <div style="display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border-radius: 12px; background: #F4F3F8">
+      <span style="font-size: 12px; color: #5E5B6B">Hesap sahibi</span>
+      <span style="font-size: 15px; font-weight: 700">{{userNameUpper}}</span>
+    </div>
+    <button onClick="{{fillDemoIban}}" style="align-self: flex-start; height: 40px; padding: 0 14px; border: 1px dashed #B9B6C6; border-radius: 10px; background: #FAFAFC; color: #4A2FD1; font-size: 14px; font-weight: 700; cursor: pointer">Demo IBAN doldur</button>
+    <label style="display: flex; align-items: flex-start; gap: 12px; padding: 16px; border: 1px solid #E6E4EE; border-radius: 16px; cursor: pointer">
+      <input type="checkbox" checked="{{ibanRefund}}" onChange="{{onIbanRefund}}" style="width: 22px; height: 22px; margin: 0; accent-color: #4A2FD1; flex-shrink: 0">
+      <span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 15px; font-weight: 700">İadeler bu hesaba yapılsın</span><span style="font-size: 13px; line-height: 1.45; color: #5E5B6B">İşletme randevunu iptal ederse 99₺ kapora otomatik bu IBAN'a döner.</span></span>
+    </label>
+    <label style="display: flex; align-items: flex-start; gap: 12px; padding: 16px; border: 1px solid #E6E4EE; border-radius: 16px; cursor: pointer">
+      <input type="checkbox" checked="{{ibanShare}}" onChange="{{onIbanShare}}" style="width: 22px; height: 22px; margin: 0; accent-color: #4A2FD1; flex-shrink: 0">
+      <span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 15px; font-weight: 700">Randevu aldığım işletmelerle paylaş</span><span style="font-size: 13px; line-height: 1.45; color: #5E5B6B">İşletme, müşteri kartında IBAN'ını görür; para iadesi ya da fark ödemesini doğrudan sana gönderebilir.</span></span>
+    </label>
+  </div>
+  <div style="padding: 12px 20px 28px; display: flex; flex-direction: column">
+    <sc-if value="{{myIbanOk}}" hint-placeholder-val="{{true}}"><button onClick="{{saveMyIban}}" style="height: 54px; border: 0; border-radius: 16px; background: #4A2FD1; color: #FFFFFF; font-size: 16px; font-weight: 700; cursor: pointer">Kaydet</button></sc-if>
+    <sc-if value="{{myIbanNotOk}}" hint-placeholder-val="{{false}}"><button disabled style="height: 54px; border: 0; border-radius: 16px; background: #E6E4EE; color: #5E5B6B; font-size: 16px; font-weight: 700">Geçerli bir IBAN gir (TR + 24 hane)</button></sc-if>
+  </div>
+</div>
+</sc-if>
+
 <!-- ================= BİLDİRİM AYARLARI ================= -->
 <sc-if value="{{isSettings}}" hint-placeholder-val="{{false}}">
 <div style="position: absolute; inset: 0; display: flex; flex-direction: column">
@@ -843,27 +930,31 @@ class Component extends DCLogic {
   demoUser() {
     return { name: 'Elif Kaya', phone: '532 111 22 33', email: 'elif@example.com', since: 'Mart 2025' };
   }
+  openOff(off, offDay, dir) {
+    while (this.dayInfo(off).jsDay === offDay) off += dir || 1;
+    return off;
+  }
   seedUp() {
     return [
-      { id: 'u1', bizId: 'b1', svc: 'Saç + sakal', price: 550, off: 1, time: '14:00', code: 'RND-4821', status: 'pending' },
+      { id: 'u1', bizId: 'b1', svc: 'Saç + sakal', price: 550, off: this.openOff(1, 0), time: '14:00', code: 'RND-4821', status: 'pending' },
       { id: 'u2', bizId: 'b3', svc: 'Kalıcı oje', price: 650, off: 4, time: '11:00', code: 'RND-5093', status: 'confirmed' }
     ];
   }
   seedPast() {
     return [
-      { id: 'p1', bizId: 'b1', svc: 'Saç kesimi', price: 400, off: -12, time: '18:00', status: 'done', rated: 5 },
-      { id: 'p2', bizId: 'b2', svc: 'Kesim + fön', price: 750, off: -27, time: '13:00', status: 'done', rated: 0 },
+      { id: 'p1', bizId: 'b1', svc: 'Saç kesimi', price: 400, off: this.openOff(-12, 0, -1), time: '18:00', status: 'done', rated: 5 },
+      { id: 'p2', bizId: 'b2', svc: 'Kesim + fön', price: 750, off: this.openOff(-27, 1, -1), time: '13:00', status: 'done', rated: 0 },
       { id: 'p3', bizId: 'b4', svc: 'Sakal tıraşı', price: 200, off: -41, time: '10:30', status: 'noshow', rated: 0 },
-      { id: 'p4', bizId: 'b5', svc: 'Fön', price: 350, off: -55, time: '16:00', status: 'cancelled', rated: 0 },
+      { id: 'p4', bizId: 'b5', svc: 'Fön', price: 350, off: this.openOff(-55, 0, -1), time: '16:00', status: 'cancelled', rated: 0 },
       { id: 'p5', bizId: 'b3', svc: 'Manikür', price: 450, off: -70, time: '15:00', status: 'done', rated: 4 },
-      { id: 'p6', bizId: 'b1', svc: 'Saç + sakal', price: 550, off: -96, time: '19:00', status: 'done', rated: 5 }
+      { id: 'p6', bizId: 'b1', svc: 'Saç + sakal', price: 550, off: this.openOff(-96, 0, -1), time: '19:00', status: 'done', rated: 5 }
     ];
   }
   seedReviews() {
     return [
-      { id: 'r1', bizId: 'b1', svc: 'Saç kesimi', stars: 5, text: 'Her zamanki gibi çok iyi, tam saatinde aldılar. Kapora sistemi sayesinde hiç beklemedim.', off: -12, reply: 'Teşekkürler Elif Hanım, eşinizi de bekleriz!' },
+      { id: 'r1', bizId: 'b1', svc: 'Saç kesimi', stars: 5, text: 'Her zamanki gibi çok iyi, tam saatinde aldılar. Kapora sistemi sayesinde hiç beklemedim.', off: this.openOff(-12, 0, -1), reply: 'Teşekkürler Elif Hanım, eşinizi de bekleriz!' },
       { id: 'r2', bizId: 'b3', svc: 'Manikür', stars: 4, text: 'Sonuç çok güzel ama 10 dakika kadar bekledim.', off: -70, reply: '' },
-      { id: 'r3', bizId: 'b1', svc: 'Saç + sakal', stars: 5, text: 'Sıcak havlu ile sakal tıraşı harikaydı.', off: -96, reply: '' }
+      { id: 'r3', bizId: 'b1', svc: 'Saç + sakal', stars: 5, text: 'Sıcak havlu ile sakal tıraşı harikaydı.', off: this.openOff(-96, 0, -1), reply: '' }
     ];
   }
   base() {
@@ -873,7 +964,8 @@ class Component extends DCLogic {
       bizId: 'b1', bizFrom: 'home', svcId: null, dayIdx: 0, time: null, agree: false, paying: false, card: 'saved', last: null,
       listTab: 'up', apptId: null, cancelAsk: false, rateId: null, rateStars: 0, rateText: '',
       upcoming: this.seedUp(), past: this.seedPast(), reviews: this.seedReviews(), favs: ['b1', 'b3'],
-      notifRead: false, nRemind: true, nWhatsapp: true, nPromo: false, toast: ''
+      notifRead: false, nRemind: true, nWhatsapp: true, nPromo: false, toast: '',
+      myIban: 'TR56 0004 6000 0000 0000 4521 00', ibanShare: true, ibanRefund: true, dekont: false
     };
   }
   componentWillUnmount() {
@@ -890,14 +982,16 @@ class Component extends DCLogic {
     return [
       { id: 'b1', name: 'Usta Berber', cat: 'Berber', area: 'Kadıköy', dist: '0,8 km', rating: '4,8', reviews: 212, initials: 'UB', tint: '#E5EEFF', ink: '#1D4ED8',
         address: 'Caferağa Mah. Moda Cad. No: 41, Kadıköy / İstanbul', hours: '09:00 – 21:00', closed: 'Pazar kapalı', phone: '0216 000 00 01',
+        iban: 'TR12 0006 2000 0000 0012 3456 78', holder: 'Hakan Yıldız', ibanDeposit: true, ibanRest: true, offDay: 0,
         about: 'Klasik ve modern erkek kesimleri, sıcak havluyla sakal tıraşı. 3 usta ile yalnızca randevulu çalışıyoruz; çay bizden.',
         photos: ['Salon', 'Koltuklar', 'Sakal tıraşı', 'Ürünler'] },
       { id: 'b2', name: 'Makas Kuaför', cat: 'Kadın Kuaförü', area: 'Moda', dist: '1,2 km', rating: '4,7', reviews: 148, initials: 'MK', tint: '#FCE7F3', ink: '#9D174D',
-        address: 'Moda Mah. Bahariye Cad. No: 88/2, Kadıköy / İstanbul', hours: '10:00 – 20:00', closed: 'Pazartesi kapalı', phone: '0216 000 00 02',
+        address: 'Moda Mah. Bahariye Cad. No: 88/2, Kadıköy / İstanbul', hours: '10:00 – 20:00', closed: 'Pazartesi kapalı', phone: '0216 000 00 02', offDay: 1,
         about: 'Kesim, renklendirme ve bakımda 12 yıllık deneyim. Organik boya seçenekleri ve keratin bakım uygulanır.',
         photos: ['Salon', 'Boya köşesi', 'Fön', 'Bekleme alanı'] },
       { id: 'b3', name: 'Nail Studio 34', cat: 'Tırnak', area: 'Bağdat Cad.', dist: '2,4 km', rating: '4,9', reviews: 96, initials: 'NS', tint: '#FEF3C7', ink: '#92400E',
         address: 'Caddebostan Mah. Bağdat Cad. No: 302, Kadıköy / İstanbul', hours: '10:00 – 21:00', closed: 'Her gün açık', phone: '0216 000 00 03',
+        iban: 'TR77 0011 1000 0000 0055 6677 88', holder: 'Nail Studio 34 Güzellik Ltd. Şti.', ibanDeposit: true, ibanRest: false,
         about: 'Manikür, pedikür, kalıcı oje ve protez tırnak. Tek kullanımlık ekipman ve steril çalışma ortamı.',
         photos: ['Masa', 'Renk kartelası', 'Nail art', 'Salon'] },
       { id: 'b4', name: 'Atölye Barber', cat: 'Berber', area: 'Yeldeğirmeni', dist: '1,5 km', rating: '4,6', reviews: 87, initials: 'AB', tint: '#DCFCE7', ink: '#166534',
@@ -905,7 +999,7 @@ class Component extends DCLogic {
         about: 'Fade, skin fade ve klasik kesimler. Hafta sonları akşam 22:00’ye kadar açığız.',
         photos: ['Atölye', 'Koltuk', 'Fade', 'Vitrin'] },
       { id: 'b5', name: 'Saç Tasarım Ece', cat: 'Kadın Kuaförü', area: 'Fenerbahçe', dist: '3,1 km', rating: '4,8', reviews: 174, initials: 'SE', tint: '#EDE9FE', ink: '#5B21B6',
-        address: 'Fenerbahçe Mah. Fener Kalamış Cad. No: 9, Kadıköy / İstanbul', hours: '09:30 – 19:30', closed: 'Pazar kapalı', phone: '0216 000 00 05',
+        address: 'Fenerbahçe Mah. Fener Kalamış Cad. No: 9, Kadıköy / İstanbul', hours: '09:30 – 19:30', closed: 'Pazar kapalı', phone: '0216 000 00 05', offDay: 0,
         about: 'Gelin saçı, özel gün topuzu ve balyaj uzmanı. Danışmanlık ücretsizdir.',
         photos: ['Salon', 'Balyaj', 'Topuz', 'Ayna'] }
     ];
@@ -939,7 +1033,7 @@ class Component extends DCLogic {
     const d = new Date(n.getFullYear(), n.getMonth(), n.getDate() + off);
     const full = d.getDate() + ' ' + months[d.getMonth()] + ' ' + long[d.getDay()];
     const rel = off === 0 ? 'Bugün' : off === 1 ? 'Yarın' : off === -1 ? 'Dün' : null;
-    return { dow: rel && off >= 0 ? rel : short[d.getDay()], num: d.getDate(), long: full, rel: rel || full,
+    return { jsDay: d.getDay(), dow: rel && off >= 0 ? rel : short[d.getDay()], num: d.getDate(), long: full, rel: rel || full,
       short: d.getDate() + ' ' + months[d.getMonth()] + (d.getFullYear() !== n.getFullYear() ? ' ' + d.getFullYear() : '') };
   }
   renderVals() {
@@ -959,7 +1053,7 @@ class Component extends DCLogic {
     // ----- auth
     const enterApp = (u, isNew) => {
       const patch = { user: u, isNew: isNew, screen: isNew ? 'perm' : 'home', code: '', codeErr: false };
-      if (isNew) Object.assign(patch, { upcoming: [], past: [], reviews: [], favs: [] });
+      if (isNew) Object.assign(patch, { upcoming: [], past: [], reviews: [], favs: [], myIban: '', ibanShare: false });
       this.setState(patch);
       if (!isNew) this.say('Tekrar hoş geldin, ' + u.name.split(' ')[0] + '!');
     };
@@ -990,7 +1084,7 @@ class Component extends DCLogic {
     const allowLoc = () => { this.setState({ loc: 'Kadıköy', screen: 'home' }); this.say('Konumun bulundu: Kadıköy'); };
 
     const notifsRaw = [
-      { t: 'Usta Berber randevunu aldı', d: 'Yarın 14:00 · Saç + sakal. 30 dk önce teyit için aranacaksın.', ago: '1 saat önce' },
+      { t: 'Usta Berber randevunu aldı', d: 'Saç + sakal randevun alındı. Randevudan 30 dk önce teyit için aranacaksın.', ago: '1 saat önce' },
       { t: 'Nail Studio 34 randevunu teyit etti', d: 'Kalıcı oje randevun kesinleşti.', ago: '5 saat önce' },
       { t: 'Makas Kuaför’ü değerlendir', d: 'Kesim + fön hizmetin nasıldı? Puan ver, diğer müşterilere yol göster.', ago: '3 gün önce' },
       { t: 'Kapora iade edilmedi', d: 'Atölye Barber randevuna gelmediğin için 99₺ kapora işletmeye aktarıldı.', ago: '1 ay önce' }
@@ -1011,9 +1105,10 @@ class Component extends DCLogic {
     const times = ['10:00', '10:30', '11:00', '11:30', '13:00', '13:30', '14:00', '15:00', '15:30', '16:00', '17:00', '18:00'];
     const slots = times.map((t, i) => {
       const past = s.dayIdx === 0 && parseInt(t, 10) <= nowH;
-      const full = past || ((i * 7 + s.dayIdx * 3 + biz.id.charCodeAt(1)) % 5) === 0;
+      const shut = biz.offDay === day.jsDay;
+      const full = shut || past || ((i * 7 + s.dayIdx * 3 + biz.id.charCodeAt(1)) % 5) === 0;
       const selected = !full && t === s.time;
-      return { t: t, full: full, fullLabel: t + (past ? ' geçti' : ' dolu'), selected: selected, idle: !full && !selected, pick: go({ time: t }) };
+      return { t: t, full: full, fullLabel: t + (shut ? ' kapalı' : past ? ' geçti' : ' dolu'), selected: selected, idle: !full && !selected, pick: go({ time: t }) };
     });
     const canContinue = !!(svc && s.time);
     const canPay = canContinue && s.agree && !s.paying;
@@ -1036,7 +1131,7 @@ class Component extends DCLogic {
       this.setState({ paying: true });
       this.timer = setTimeout(() => {
         const c = this.cur();
-        const bk = { id: 'u' + Date.now(), bizId: biz.id, svc: svc.name, price: svc.price, off: c.dayIdx, time: c.time, code: 'RND-' + Math.floor(1000 + Math.random() * 9000), status: 'pending' };
+        const bk = { id: 'u' + Date.now(), bizId: biz.id, svc: svc.name, price: svc.price, off: c.dayIdx, time: c.time, code: 'RND-' + Math.floor(1000 + Math.random() * 9000), status: c.card === 'iban' ? 'iban' : 'pending' };
         this.setState({ paying: false, screen: 'done', last: bk, upcoming: [bk].concat(c.upcoming) });
       }, 1300);
     };
@@ -1047,7 +1142,8 @@ class Component extends DCLogic {
     const upList = sortedUp.map((u) => {
       const b = bz(u.bizId);
       return Object.assign({}, u, { bizName: b.name, initials: b.initials, tint: b.tint, ink: b.ink,
-        whenLabel: this.dayInfo(u.off).rel + ', ' + u.time, isConfirmed: u.status === 'confirmed', isPending: u.status !== 'confirmed',
+        whenLabel: this.dayInfo(u.off).rel + ', ' + u.time, isConfirmed: u.status === 'confirmed', isPending: u.status === 'pending',
+        isIban: u.status === 'iban', payText: u.status === 'iban' ? 'Havale bekleniyor' : 'Kapora ödendi',
         open: go({ screen: 'appt', apptId: u.id, cancelAsk: false }) });
     });
     const pastList = s.past.slice().sort((a, b) => b.off - a.off).map((p) => {
@@ -1101,6 +1197,17 @@ class Component extends DCLogic {
         note: p.status === 'done' ? 'hizmetten düşüldü' : p.status === 'noshow' ? 'gelinmedi, iade yok' : 'iptal, iade yok' })));
 
     const scr = s.screen;
+    const ctxBiz = scr === 'appt' ? aBiz : (scr === 'done' && last ? bz(last.bizId) : biz);
+    const apptIban = !!appt && appt.status === 'iban';
+    const ibanTitle = scr === 'pay' ? 'İşletmenin banka hesabı'
+      : (scr === 'done' || apptIban) ? '99₺ kaporayı bu hesaba gönder'
+      : 'Kalan ' + (appt ? fmt(Math.max(appt.price - 99, 0)) : '') + ' için IBAN (isteğe bağlı)';
+    const ibanNote = scr === 'pay' ? 'Yerini ayırttıktan sonra 99₺’yi bu hesaba gönder ve açıklamaya randevu kodunu yaz. İşletme ödemeyi görünce randevun kesinleşir.'
+      : scr === 'done' ? 'Açıklama: ' + (last ? last.code : '') + '. İşletme ödemeyi onaylayınca randevun kesinleşir.'
+      : apptIban ? 'Açıklama: ' + appt.code + '. Dekontu yüklersen işletme daha hızlı onaylar.'
+      : 'Kalan tutarı istersen salonda nakit ya da kartla da ödeyebilirsin.';
+    const myIbanClean = (s.myIban || '').replace(/\s/g, '').toUpperCase();
+    const myIbanOk = /^TR\d{24}$/.test(myIbanClean);
     const tabOf = { home: 'home', list: 'list', favs: 'favs', profile: 'profile' };
     const navTab = tabOf[scr] || '';
     const navColor = (t) => (navTab === t ? '#4A2FD1' : '#5E5B6B');
@@ -1150,13 +1257,14 @@ class Component extends DCLogic {
       bizName: biz.name, bizCat: biz.cat, bizArea: biz.area, bizDist: biz.dist, bizRating: biz.rating, bizReviews: biz.reviews,
       bizInitials: biz.initials, bizTint: biz.tint, bizInk: biz.ink, bizAddress: biz.address, bizHours: biz.hours, bizClosed: biz.closed,
       bizPhone: biz.phone, bizAbout: biz.about, bizPhotos: bizPhotos, bizReviewList: bizReviewList,
+      bizDayClosed: biz.offDay === day.jsDay,
       bizIsFav: s.favs.indexOf(biz.id) >= 0, bizNotFav: s.favs.indexOf(biz.id) < 0, toggleFav: toggleFav,
       bizBack: go({ screen: back[s.bizFrom] || 'home' }),
       directions: () => this.say('Haritalar uygulaması açılıyor…'),
       services: services, days: days, slots: slots,
       canContinue: canContinue, cannotContinue: !canContinue,
       selLine: svc ? svc.name + ' · ' + day.long + ', ' + (s.time || '') : '',
-      goPay: go({ screen: 'pay', agree: false }), goBiz: go({ screen: 'biz' }),
+      goPay: go({ screen: 'pay', agree: false, card: 'saved', dekont: false }), goBiz: go({ screen: 'biz' }),
 
       sumSvc: svc ? svc.name : '', sumWhen: day.long + ', ' + (s.time || ''),
       sumPrice: svc ? fmt(svc.price) : '', sumRest: svc ? fmt(Math.max(svc.price - 99, 0)) : '',
@@ -1177,7 +1285,11 @@ class Component extends DCLogic {
       upList: upList, noUp: upList.length === 0, pastList: pastList,
 
       apptBack: go({ screen: 'list', listTab: 'up' }),
-      aConfirmed: !!appt && appt.status === 'confirmed', aPending: !appt || appt.status !== 'confirmed',
+      aConfirmed: !!appt && appt.status === 'confirmed', aPending: !appt || appt.status === 'pending',
+      aIban: !!appt && appt.status === 'iban',
+      aDepLabel: appt && appt.status === 'iban' ? 'Kapora (havale bekleniyor)' : 'Ödenen kapora',
+      aDepColor: appt && appt.status === 'iban' ? '#6B21A8' : '#157F3D',
+      aShowIban: !!appt && !!aBiz.iban && (appt.status === 'iban' || !!aBiz.ibanRest),
       aWhen: appt ? this.dayInfo(appt.off).rel + ', ' + appt.time : '', aSvc: appt ? appt.svc : '', aBiz: aBiz.name,
       aCode: appt ? appt.code : '', aPrice: appt ? fmt(appt.price) : '', aRest: appt ? fmt(Math.max(appt.price - 99, 0)) : '',
       aAddress: aBiz.address,
@@ -1201,10 +1313,39 @@ class Component extends DCLogic {
       onRemind: (e) => this.setState({ nRemind: e.target.checked }),
       onWhatsapp: (e) => this.setState({ nWhatsapp: e.target.checked }),
       onPromo: (e) => this.setState({ nPromo: e.target.checked }),
+
+      ibanTitle: ibanTitle, ibanNote: ibanNote, ibanHolder: ctxBiz.holder || ctxBiz.name, ibanText: ctxBiz.iban || '',
+      copyIban: () => {
+        try { if (navigator.clipboard && ctxBiz.iban) navigator.clipboard.writeText(ctxBiz.iban.replace(/\s/g, '')); } catch (e) { /* demo */ }
+        this.say('IBAN kopyalandı');
+      },
+      bizTakesIban: !!biz.ibanDeposit, cardIban: s.card === 'iban', pickIban: go({ card: 'iban' }),
+      dekontNot: !s.dekont, dekontDone: !!s.dekont,
+      uploadDekont: () => { this.setState({ dekont: true }); this.say('Dekont yüklendi (demo)'); },
+      payLabel: s.card === 'iban' ? 'Yerimi ayır, havaleyle öde' : '99₺ öde ve yerimi ayır',
+      lastPayText: last && last.status === 'iban' ? 'Yerin ayrıldı. 99₺ kaporayı havaleyle göndermeyi unutma.' : '99₺ kapora ödendi.',
+      lastIsIban: !!last && last.status === 'iban',
+      shareLine: s.myIban && s.ibanShare ? 'IBAN’ın bu işletmeyle paylaşılıyor; iade olursa doğrudan sana gönderilir.' : 'İade için IBAN’ını bu işletmeyle paylaşabilirsin.',
+      shareBtn: s.myIban ? 'Düzenle' : 'IBAN ekle',
+      isMyIban: scr === 'myiban',
+      goMyIban: go({ screen: 'myiban', ibanFrom: scr }),
+      myIbanBack: go({ screen: s.ibanFrom === 'appt' ? 'appt' : 'profile' }),
+      myIban: s.myIban, onMyIban: (e) => this.setState({ myIban: e.target.value }),
+      ibanRefund: s.ibanRefund, onIbanRefund: (e) => this.setState({ ibanRefund: e.target.checked }),
+      ibanShare: s.ibanShare, onIbanShare: (e) => this.setState({ ibanShare: e.target.checked }),
+      fillDemoIban: go({ myIban: 'TR56 0004 6000 0000 0000 4521 00', ibanShare: true, ibanRefund: true }),
+      myIbanOk: myIbanOk, myIbanNotOk: !myIbanOk,
+      saveMyIban: () => {
+        if (!myIbanOk) return;
+        this.setState({ screen: s.ibanFrom === 'appt' ? 'appt' : 'profile', myIban: myIbanClean.replace(/(.{4})/g, '$1 ').trim() });
+        this.say(s.ibanShare ? 'IBAN kaydedildi ve işletmelerle paylaşıldı' : 'IBAN kaydedildi');
+      },
+      myIbanShort: myIbanClean ? '•••• ' + myIbanClean.slice(-4) : 'Ekle',
       logout: () => {
         const b = this.base();
         this.setState({ screen: 'welcome', user: null, isNew: false, phone: '', code: '', regName: '', regEmail: '', regKvkk: false,
-          upcoming: b.upcoming, past: b.past, reviews: b.reviews, favs: b.favs, notifRead: false, toast: '' });
+          upcoming: b.upcoming, past: b.past, reviews: b.reviews, favs: b.favs, notifRead: false, toast: '',
+          myIban: b.myIban, ibanShare: b.ibanShare, ibanRefund: b.ibanRefund });
       }
     };
   }
